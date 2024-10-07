@@ -68,7 +68,34 @@ export const verifyEmail = async function(req,res){
 
 
 export const login = async (req, res) => {
-    res.send("Login Up");
+    try {
+        const {email,password} = req.body;
+        if(!email || !password){
+            return res.status(400).json({success:false,msg:"All fields are required"});
+        }
+        const user = await User.findOne({email});
+        if(!user){
+            return res.status(400).json({success:false , msg:"Invalid credentials"});
+        }
+        const isPasswordValid = await bcryptjs.compare(password,user.password);
+        if(!isPasswordValid){
+            return res.status(400).json({success:false , msg:"Invalid Password"});
+        }
+        await genarateTokenAndSetCookie(res,user._id);
+        user.lastLogin = new Date();
+        await user.save();
+        return res.status(200).json({
+            success:true,
+            msg:"Logged in Successfully",
+            user:{
+                ...user._doc,
+                password:null
+            }
+        })
+    } catch (error) {
+        console.log(error.message);
+        res.status(400).json({success:false,msg:error.message});
+    }
 }
 export const logout = async (req, res) => {
     try {
@@ -78,4 +105,8 @@ export const logout = async (req, res) => {
         console.log(error.message);
         return res.status(400).json({ success: false, msg: error.message })
     }
+}
+
+export const forgotPassword = async (req,res) => {
+    res.send("Forgot Password");
 }
