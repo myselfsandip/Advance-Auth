@@ -1,13 +1,13 @@
-# Overview {#overview .unnumbered}
+# Overview
 
 This project is a full-featured authentication system designed to
 provide secure user management, including account registration, email
 verification, login, password reset, and protected routes for authorized
 access. Below is a breakdown of the implemented features.
 
-# 🚀 Features {#features .unnumbered}
+# 🚀 Features
 
-## Backend {#backend .unnumbered}
+## Backend 
 
 -   🔧 **Backend Setup**: Configured Node.js/Express server with all
     necessary dependencies for authentication.
@@ -42,7 +42,7 @@ access. Below is a breakdown of the implemented features.
 -   ✔️ **Check Auth Endpoint**: Endpoint to verify user authentication
     status for protected routes.
 
-## Frontend {#frontend .unnumbered}
+## Frontend 
 
 -   🌐 **Frontend Setup**: React-based frontend to provide a seamless
     user experience.
@@ -73,14 +73,14 @@ access. Below is a breakdown of the implemented features.
 -   🔄 **Implementing Forgot Password**: Forgot password functionality
     integrated with the backend.
 
-## Deployment {#deployment .unnumbered}
+## Deployment
 
 -   🚀 **Super Detailed Deployment**: Fully deployed and
     production-ready, ensuring seamless operation across environments.
 
-# 🛠️ Getting Started {#getting-started .unnumbered}
+# 🛠️ Getting Started 
 
-## Prerequisites {#prerequisites .unnumbered}
+## Prerequisites 
 
 -   Node.js
 
@@ -88,7 +88,7 @@ access. Below is a breakdown of the implemented features.
 
 -   Git
 
-## Installation {#installation .unnumbered}
+## Installation 
 
 1.  **Clone the repository**:
 
@@ -108,6 +108,3 @@ access. Below is a breakdown of the implemented features.
 
             npm start
 
-# License {#license .unnumbered}
-
-This project is licensed under the MIT License.
