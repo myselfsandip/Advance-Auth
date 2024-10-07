@@ -37,11 +37,12 @@ export const signup = async (req, res) => {
         })
 
     } catch (error) {
+        console.log(error)
         return res.status(400).json({ success: false, msg: error.message })
     }
 }
 
-export const verifyUser = async function(req,res){
+export const verifyEmail = async function(req,res){
     try {
         const {code} = req.body;
         const user = await User.findOne({
@@ -56,6 +57,10 @@ export const verifyUser = async function(req,res){
         user.verificationTokenExpiresAt = undefined;
         await user.save();
         await sendWelcomeEmail(user.email,user.name);
+        return res.status(201).json({success:true,msg:"Email Verified Successfully",user: {
+            ...user._doc,
+            password: null
+        }});
     } catch (error) {
         return res.status(400).json({ success: false, msg: error.message })
     }
@@ -63,8 +68,14 @@ export const verifyUser = async function(req,res){
 
 
 export const login = async (req, res) => {
-    res.send("Sign Up");
+    res.send("Login Up");
 }
 export const logout = async (req, res) => {
-    res.send("Sign Up");
+    try {
+        res.clearCookie("token");
+        return res.status(201).json({success:true,msg:"Logged out Successfully!"});
+    } catch (error) {
+        console.log(error.message);
+        return res.status(400).json({ success: false, msg: error.message })
+    }
 }

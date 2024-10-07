@@ -48,11 +48,12 @@ export const sendWelcomeEmail = async function (email, name) {
                                 Name: name
                             }
                         ],
-                        Subject: 'Welcome!',
+                        Subject:` Welcome ${name}!`,
                         HTMLPart: WELCOME_EMAIL_TEMPLATE,
                     }
                 ]
             });
+            console.log("Verification Successfull!");
     } catch (error) {
         console.error("Full Error Response:", error.response?.data || error); // Log full error response
         throw new Error(`Error sending welcome email: ${error}`);
