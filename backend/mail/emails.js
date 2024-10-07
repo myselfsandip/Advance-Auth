@@ -1,5 +1,5 @@
 import mailjet from './mailjetConfig.js'; // Import the Mailjet client
-import { VERIFICATION_EMAIL_TEMPLATE } from './emailTemplates.js';
+import { VERIFICATION_EMAIL_TEMPLATE, WELCOME_EMAIL_TEMPLATE } from './emailTemplates.js';
 
 export async function sendVerificationEmail(userId, email, name, verificationToken) {
     try {
@@ -49,7 +49,7 @@ export const sendWelcomeEmail = async function (email, name) {
                             }
                         ],
                         Subject: 'Welcome!',
-                        HTMLPart: `<h1>Welcome, ${name}!</h1><p>Thank you for joining us.</p>`,
+                        HTMLPart: WELCOME_EMAIL_TEMPLATE,
                     }
                 ]
             });
