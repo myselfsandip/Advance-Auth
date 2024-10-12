@@ -3,7 +3,7 @@ import crypto from "crypto";
 
 import { User } from "../models/userModel.js";
 import { genarateTokenAndSetCookie } from "../utils/genarateTokenAndSetCookie.js";
-import { sendVerificationEmail, sendWelcomeEmail , sendPasswordResetEmail } from "../mail/emails.js"
+import { sendVerificationEmail, sendWelcomeEmail, sendPasswordResetEmail, sendResetSuccessEmail } from "../mail/emails.js"
 
 export const signup = async (req, res) => {
     try {
@@ -70,7 +70,6 @@ export const verifyEmail = async function (req, res) {
     }
 }
 
-
 export const login = async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -112,21 +111,21 @@ export const logout = async (req, res) => {
 }
 
 export const forgotPassword = async (req, res) => {
-    const {email} = req.body;
+    const { email } = req.body;
     try {
-        const emailExists = await User.findOne({email});
-        if(!emailExists){
-            return res.status(400).json({success:false,msg:"User does not exists!"});
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(400).json({ success: false, msg: "User does not exists!" });
         }
         // Genarate Reset Email Token
-        const resetToken =  crypto.randomBytes(20).toString('hex');
-        const resetTokenExpiresAt = Date.now() +  1 * 60 * 60 * 1000   // 1 hour
-        User.resetPasswordToken = resetToken;
-        User.resetPasswordExpiresAt = resetTokenExpiresAt;
-        await User.save();
+        const resetToken = crypto.randomBytes(20).toString('hex');
+        const resetTokenExpiresAt = Date.now() + 1 * 60 * 60 * 1000;   // 1 hour
+        user.resetPasswordToken = resetToken;
+        user.resetPasswordExpiresAt = resetTokenExpiresAt;
+        await user.save();
 
         // Send Email
-        await sendPasswordResetEmail(email,`${process.env.CLIENT_URL}/reset_password/${resetToken}`);
+        await sendPasswordResetEmail(email, `${process.env.CLIENT_URL}/reset_password/${resetToken}`);
 
         res.status(200).json({ success: true, message: "Password reset link sent to your email" });
     } catch (error) {
@@ -135,7 +134,41 @@ export const forgotPassword = async (req, res) => {
     }
 }
 
+export const resetPassword = async function (req, res) {
+    try {
+        const { token } = req.params;
+        const { password } = req.body;
+        // Finding user and checking if the reset token is valid or not
+        const user = await User.findOne({ resetPasswordToken: token, resetPasswordExpiresAt: { $gt: Date.now() } });
+        if (!user) return res.status(400).json({ success: false, msg: "Inavlid or expired reset token!" });
+        // Store Pass in DB
+        const hashedPass = await bcryptjs.hash(password, 12);
+        user.password = hashedPass;
+        // Remove Reset Pass values from DB
+        user.resetPasswordToken = undefined;
+        user.resetPasswordExpiresAt = undefined;
+        user.save();
+        // Send Reset Success Email
+        await sendResetSuccessEmail(user.email);
+        return res.status(201).json({
+            success: true, msg: "Password Reset Successfull!",
+            user: {
+                ...user._doc,
+                password: null
+            }
+        })
+    } catch (error) {
+        return res.status(400).json({ success: false, msg: error.message })
+    }
+}
 
-export const resetPassword = function(req,res)   {
-    res.send("Reset");
+export const checkAuth = async (req, res) => {
+    try {
+        const user = await User.findOne({_id:req.userID}).select("-password");
+        if(!user) return res.status(400).json({success:false,msg:"Invalid User"});
+        return res.status(201).json({success:true,user});
+    } catch (error) {
+        console.log("Error Happend : ", error.message);
+        return res.status(400).json({ success: false, msg: error.message })
+    }
 }

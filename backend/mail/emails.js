@@ -1,5 +1,5 @@
 import mailjet from './mailjetConfig.js'; // Import the Mailjet client
-import { VERIFICATION_EMAIL_TEMPLATE, WELCOME_EMAIL_TEMPLATE , PASSWORD_RESET_REQUEST_TEMPLATE } from './emailTemplates.js';
+import { VERIFICATION_EMAIL_TEMPLATE, WELCOME_EMAIL_TEMPLATE , PASSWORD_RESET_REQUEST_TEMPLATE, PASSWORD_RESET_SUCCESS_TEMPLATE } from './emailTemplates.js';
 
 export async function sendVerificationEmail(userId, email, name, verificationToken) {
     try {
@@ -83,6 +83,34 @@ export const sendPasswordResetEmail = async (email, resetURL) => {
                 ]
             });
         console.log("Password Reset Email Send Successfully!");
+    } catch (error) {
+        console.error("Full Error Response:", error.response?.data || error); // Log full error response
+        throw new Error(`Error sending welcome email: ${error}`);
+    }
+}
+
+export const sendResetSuccessEmail = async (email) => {
+    try {
+        const request = await mailjet
+            .post('send', { version: 'v3.1' })
+            .request({
+                Messages: [
+                    {
+                        From: {
+                            Email: 'singharaj2019@gmail.com',
+                            Name: 'Sandip Singha'
+                        },
+                        To: [
+                            {
+                                Email: email,
+                            }
+                        ],
+                        Subject: `Password Reset Successfull`,
+                        HTMLPart: PASSWORD_RESET_SUCCESS_TEMPLATE,
+                    }
+                ]
+            });
+        console.log("Password Reset Successfully!");
     } catch (error) {
         console.error("Full Error Response:", error.response?.data || error); // Log full error response
         throw new Error(`Error sending welcome email: ${error}`);
